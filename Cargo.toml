@@ -1,0 +1,15 @@
+[package]
+name = "immolate"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+hidraw = ["hidapi/linux-static-hidraw"]
+native = ["hidapi/linux-native-basic-udev"]
+default = []
+
+[dependencies]
+anyhow = "1.0.102"
+hidapi = { git = "https://github.com/Mstrodl/hidapi-rs", branch = "hotfix/mstrodl/readwrite-ioctl", version = "2.6.5", default-features = false }
+hidparser = "1.0.3"
+nusb = "0.2.3"
