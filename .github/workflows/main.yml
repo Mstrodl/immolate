@@ -10,7 +10,7 @@ jobs:
         with:
           toolchain: stable
           components: clippy
-      - uses: clechasseur/rs-clippy-check@v6
+      - uses: clechasseur/rs-clippy-check@v6.0.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           use-cross: true
@@ -24,7 +24,7 @@ jobs:
         with:
           toolchain: stable
           components: clippy
-      - uses: clechasseur/rs-cargo@v5
+      - uses: clechasseur/rs-cargo@v5.0.4
         with:
           command: fmt
           args: --check --features native
@@ -43,7 +43,7 @@ jobs:
         with:
           toolchain: stable
           target: ${{ matrix.target }}
-      - uses: clechasseur/rs-cargo@v5
+      - uses: clechasseur/rs-cargo@v5.0.4
         name: Build
         with:
           use-cross: true
