@@ -43,7 +43,7 @@ jobs:
       - uses: clechasseur/rs-cargo@v5.0.4
         name: Build
         with:
-          use-cross: true
+          tool: cross
           command: build
           args: --release --features native --target=${{ matrix.target }}
 
