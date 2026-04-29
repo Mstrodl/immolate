@@ -59,7 +59,7 @@ jobs:
           echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
           echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
       - name: Configure packaging name for non-releasing branch
-        if: ${{ (github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'ComputerScienceHouse' }}
+        if: ${{ (github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'Mstrodl' }}
         run: |
           echo "release_tag=" >> $GITHUB_ENV
           echo "release_name=" >> $GITHUB_ENV
