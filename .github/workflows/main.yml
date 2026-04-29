@@ -1,0 +1,95 @@
+on: push
+name: Clippy check
+jobs:
+  clippy_check:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: clechasseur/rs-clippy-check@v6.0.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          use-cross: true
+          args: --features native
+  rustmt_check:
+    name: Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+        with:
+          toolchain: stable
+          components: clippy
+      - uses: clechasseur/rs-cargo@v5.0.4
+        with:
+          command: fmt
+          args: --check --features native
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v1
+        name: Clone
+      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+        name: Setup toolchain
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+      - uses: clechasseur/rs-cargo@v5.0.4
+        name: Build
+        with:
+          use-cross: true
+          command: build
+          args: --release --features native --target=${{ matrix.target }}
+
+      # Env setup!
+      - name: Configure packaging name for git main branch
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
+          echo "release_name=preview" >> $GITHUB_ENV
+      - name: Configure packaging name for tag
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
+          echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
+      - name: Configure packaging name for non-releasing branch
+        if: ${{ (github.ref != 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'ComputerScienceHouse' }}
+        run: |
+          echo "release_tag=" >> $GITHUB_ENV
+          echo "release_name=" >> $GITHUB_ENV
+      - name: Check for prerelease
+        if: ${{ github.ref == 'refs/heads/main' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=true" >> $GITHUB_ENV
+      - name: Check for non-prerelease
+        if: ${{ github.ref != 'refs/heads/main' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=false" >> $GITHUB_ENV
+      - name: Show packaging name
+        run: |
+          echo "${{ env.release_tag }}"
+          echo "${{ env.release_name }}"
+          echo "${{ env.release_pre }}"
+      - name: Rename artifacts
+        run: |
+          mv target/${{ matrix.target }}/release/immolate immolate-release-${{ matrix.target }}
+
+      - name: Create Release
+        if: ${{ env.release_tag != '' }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "immolate-release-${{ matrix.target }}"
+          tag: ${{ env.release_tag }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}
