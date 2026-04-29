@@ -1,6 +1,4 @@
-on:
-  push: true
-  pull_request: true
+on: [push, pull_request]
 
 name: Clippy check
 jobs:
