@@ -5,12 +5,12 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+      - uses: actions/checkout@v6
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
           components: clippy
-      - uses: clechasseur/rs-clippy-check@v6.0.3
+      - uses: clechasseur/rs-clippy-check@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           use-cross: true
@@ -19,12 +19,12 @@ jobs:
     name: Code Style
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+      - uses: actions/checkout@v6
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
           components: clippy
-      - uses: clechasseur/rs-cargo@v5.0.4
+      - uses: clechasseur/rs-cargo@v5
         with:
           command: fmt
           args: --check --features native
@@ -36,14 +36,14 @@ jobs:
         target:
           - x86_64-unknown-linux-musl
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v6
         name: Clone
-      - uses: actions-rust-lang/setup-rust-toolchain@v1.16.0
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
         name: Setup toolchain
         with:
           toolchain: stable
           target: ${{ matrix.target }}
-      - uses: clechasseur/rs-cargo@v5.0.4
+      - uses: clechasseur/rs-cargo@v5
         name: Build
         with:
           use-cross: true
